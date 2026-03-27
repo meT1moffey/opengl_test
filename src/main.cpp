@@ -200,8 +200,13 @@ int main() {
         }
     }
 
+    lines.emplace_back(program, Color(0, 1, 0), std::vector<Vector3>{{-1, 0, 0}, {+1, 0, 0}});
+    lines.emplace_back(program, Color(0, 1, 0), std::vector<Vector3>{{0, -1, 0}, {0, +1, 0}});
+    lines.emplace_back(program, Color(0, 1, 0), std::vector<Vector3>{{0, 0, -1}, {0, 0, +1}});
+
     float rot_speed = 2;
     std::chrono::time_point<std::chrono::system_clock> prev_time = std::chrono::system_clock::now();
+    UniformFloat zoom(program, "zoom");
     while(win.is_open()) {
         win.poll_events();
 
@@ -218,14 +223,10 @@ int main() {
         if(win.key_held(GLFW_KEY_DOWN))
             cam.rotate({{1, 0, 0}}, -rot_speed * delta_time);
         
-        if(win.key_held(GLFW_KEY_MINUS)) {
-            UniformVector<1> zoom(program, "zoom");
+        if(win.key_held(GLFW_KEY_MINUS))
             zoom.set(zoom.get() / 1.1);
-        }
-        if(win.key_held(GLFW_KEY_EQUAL)) {
-            UniformVector<1> zoom(program, "zoom");
+        if(win.key_held(GLFW_KEY_EQUAL))
             zoom.set(zoom.get() * 1.1);
-        }
 
         win.clear();
         ico1.draw();

@@ -93,6 +93,20 @@ protected:
 
 using Vector3 = Vector<float, 3>;
 
+class UniformFloat : public Uniform {
+public:
+    UniformFloat(const Program& prog, const std::string& name) : Uniform(prog, name) {}
+
+    float get() const {
+        float buffer;
+        glGetnUniformfv(program, location, sizeof(buffer), &buffer);
+        return buffer;
+    }
+    void set(float value) const {
+        glUniform1fv(location, 1, &value);
+    }
+};
+
 template<size_t size>
 class UniformVector : public Uniform {
 public:
@@ -114,7 +128,6 @@ public:
 };
 
 using Uniform3f = UniformVector<3>;
-using Uniform4f = UniformVector<4>;
 
 using Matrix3 = Matrix<float, 3>;
 
@@ -157,7 +170,6 @@ public:
         pos.set(pos.get() + delta);
     }
     void rotate(Vector3 axis, float angle) {
-        axis = rot.get() * axis;
         Matrix3 rev_transform;
         if(axis[0] != 0) {
             rev_transform = {{
@@ -192,7 +204,7 @@ public:
         }};
         Matrix3 transform = rev_transform.inverse();
 
-        rot.set(rev_transform * new_rot * transform * rot.get());
+        rot.set(rot.get() * rev_transform * new_rot * transform);
     }
 private:
     Uniform3f pos;
