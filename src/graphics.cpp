@@ -151,11 +151,7 @@ class Camera {
 public:
     Camera(const Program& program) :
         pos(program, "camera_pos"),
-        rot(program, "camera_rot")
-    {
-        pos.set({0, 0, 0});
-        rot.set(Matrix3::unit());
-    }
+        rot(program, "camera_rot") {}
 
     void move(Vector3 delta) {
         pos.set(pos.get() + delta);

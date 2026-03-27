@@ -29,17 +29,15 @@ float area(const Triangle& tr) {
 }
 
 int main() {
-    int mode;
-    std::cout << "Введите режим (0) - сферы снаружи (1) - концентрические сферы:";
-    std::cin >> mode;
     double potential_dif;
     std::cout << "Разница потенциалов (В):";
     std::cin >> potential_dif;
-    std::pair<float, float> data;
-    std::cout << (mode == 0 ? "Расстояние между сферами (м):" : "Радиус первой сферы (м):"); 
-    std::cin >> data.first;
-    std::cout << (mode == 0 ? "Радиус сфер (м):" : "Радиус второй сферы (м):");
-    std::cin >> data.second;
+    float distance;
+    std::cout << "Расстояние между сферами (м):"; 
+    std::cin >> distance;
+    float radius;
+    std::cout << "Радиус сфер (м):";
+    std::cin >> radius;
     std::cout << "Запуск вычислений...\n";
 
     GraphicsDrive drive;
@@ -62,13 +60,11 @@ int main() {
 
     Camera cam(program);
 
-    Vector3 center1{mode == 0 ? -data.first / 2 : 0, 0, 0};
-    float rad1 = mode == 0 ? data.second : data.first;
-    IcoSphere ico1(program, center1, rad1, sphere_detail);
+    Vector3 center1{-distance / 2, 0, 0};
+    IcoSphere ico1(program, center1, radius, sphere_detail);
     
-    Vector3 center2{mode == 0 ? +data.first / 2 : 0, 0, 0};
-    float rad2 = mode == 0 ? data.second : data.second;
-    IcoSphere ico2(program, center2, rad2, sphere_detail);
+    Vector3 center2{+distance / 2, 0, 0};
+    IcoSphere ico2(program, center2, radius, sphere_detail);
     
     const double electric_const = 8.988e9;
 
@@ -222,12 +218,19 @@ int main() {
             cam.rotate({{1, 0, 0}}, +rot_speed * delta_time);
         if(win.key_held(GLFW_KEY_DOWN))
             cam.rotate({{1, 0, 0}}, -rot_speed * delta_time);
+        
+        if(win.key_held(GLFW_KEY_MINUS)) {
+            UniformVector<1> zoom(program, "zoom");
+            zoom.set(zoom.get() / 1.1);
+        }
+        if(win.key_held(GLFW_KEY_EQUAL)) {
+            UniformVector<1> zoom(program, "zoom");
+            zoom.set(zoom.get() * 1.1);
+        }
 
         win.clear();
-        if(rad1 <= rad2 || !win.key_held(GLFW_KEY_Q))
-            ico1.draw();
-        if(rad2 <= rad1 || !win.key_held(GLFW_KEY_Q))
-            ico2.draw();
+        ico1.draw();
+        ico2.draw();
         
         for(const Line& line : lines)
             line.draw();
