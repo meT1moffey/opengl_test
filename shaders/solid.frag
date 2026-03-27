@@ -1,8 +1,9 @@
 #version 330 core
 
+in vec4 v_color;
+
 out vec4 FragColor;
-uniform vec4 fill_color;
 
 void main() {
-   FragColor = fill_color;
+   FragColor = v_color;
 }

@@ -61,10 +61,10 @@ int main() {
     Camera cam(program);
 
     Vector3 center1{-distance / 2, 0, 0};
-    IcoSphere ico1(program, center1, radius, sphere_detail);
+    IcoSphere ico1(program, {0.5, 0.5, 0.5}, center1, radius, sphere_detail);
     
     Vector3 center2{+distance / 2, 0, 0};
-    IcoSphere ico2(program, center2, radius, sphere_detail);
+    IcoSphere ico2(program, {0.5, 0.5, 0.5}, center2, radius, sphere_detail);
     
     const double electric_const = 8.988e9;
 
@@ -167,8 +167,7 @@ int main() {
             cur += eps * voltage(cur) / voltage_diff(cur).len();
         }
 
-        lines.emplace_back(program, points);
-        lines.back().setColor({1, 1, 0});
+        lines.emplace_back(program, Color(1, 1, 0), points);
     }
 
     {
