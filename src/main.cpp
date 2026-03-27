@@ -150,10 +150,10 @@ int main() {
             }
             return volt;
         };
-        float eps = 0.05;
+        float eps = 0.1;
 
         Vector3 cur = start;
-        while(points.size() < 250) {
+        while(points.size() < 100) {
             points.push_back(cur);
             cur -= eps * voltage(cur) / voltage_diff(cur).len();
         }
@@ -162,7 +162,7 @@ int main() {
         points.pop_back();
 
         cur = start;
-        while(points.size() < 500) {
+        while(points.size() < 200) {
             points.push_back(cur);
             cur += eps * voltage(cur) / voltage_diff(cur).len();
         }
@@ -204,8 +204,9 @@ int main() {
     lines.emplace_back(program, Color(0, 1, 0), std::vector<Vector3>{{0, -1, 0}, {0, +1, 0}});
     lines.emplace_back(program, Color(0, 1, 0), std::vector<Vector3>{{0, 0, -1}, {0, 0, +1}});
 
-    float rot_speed = 2;
+    float rot_sensivity = 0.003;
     std::chrono::time_point<std::chrono::system_clock> prev_time = std::chrono::system_clock::now();
+    Window::Cursor prev_cursor = win.cursor_pos();
     UniformFloat zoom(program, "zoom");
     while(win.is_open()) {
         win.poll_events();
@@ -214,19 +215,16 @@ int main() {
         double delta_time = std::chrono::duration_cast<std::chrono::microseconds>(cur_time - prev_time).count() / 1e6;
         prev_time = cur_time;
 
-        if(win.key_held(GLFW_KEY_LEFT))
-            cam.rotate({{0, 1, 0}}, -rot_speed * delta_time);
-        if(win.key_held(GLFW_KEY_RIGHT))
-            cam.rotate({{0, 1, 0}}, +rot_speed * delta_time);
-        if(win.key_held(GLFW_KEY_UP))
-            cam.rotate({{1, 0, 0}}, +rot_speed * delta_time);
-        if(win.key_held(GLFW_KEY_DOWN))
-            cam.rotate({{1, 0, 0}}, -rot_speed * delta_time);
+        Window::Cursor cur_cursor = win.cursor_pos();
+        Window::Cursor cursor_move = cur_cursor - prev_cursor;
+        prev_cursor = cur_cursor;
+
+        if(win.button_held(GLFW_MOUSE_BUTTON_LEFT)) {
+            cam.rotate({0, 1, 0}, -rot_sensivity * cursor_move[0]);
+            cam.rotate({1, 0, 0}, rot_sensivity * cursor_move[1]);
+        }
         
-        if(win.key_held(GLFW_KEY_MINUS))
-            zoom.set(zoom.get() / 1.1);
-        if(win.key_held(GLFW_KEY_EQUAL))
-            zoom.set(zoom.get() * 1.1);
+        zoom.set(pow(1.1, win.get_scroll()));
 
         win.clear();
         ico1.draw();
